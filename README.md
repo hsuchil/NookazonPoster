@@ -1,6 +1,11 @@
 # NookazonPoster
 A simple python script to manage Nookazon postings.
 
+To use:
+- Get your seller_id and auth token from the Nookazon website.
+- Update the `_listings` variable at the top of the script to match what you're trying to sell.
+- See usage below.
+
 ```
 usage: Nookazon.py [-h] [-a] [-du] [-do] [-d] [-p MINUTES]
 

@@ -220,15 +220,36 @@ def delete_listings():
 
 
 def refresh_periodically(timeInMinutes):
-    start_time = time.time()
     while True:
-        print('Refreshing postings.')
-        # delete_listings()
-        # add_listings()
+        print('Refreshing postings...')
+        delete_listings()
+        add_listings()
         time.sleep(timeInMinutes * 60)
 
 
-def do_nothing():
+def search_item(search_terms):
+    search_query = search_terms[0]
+    for term in search_terms[1:]:
+        search_query = '{}%20{}'.format(search_query, term)
+
+    connection = get_connection()
+    api = '/api/items?variants=&search={}&user={}'.format(
+        search_query,
+        _seller)
+
+    connection.request('GET', api, None, get_default_headers())
+    response = connection.getresponse().read().decode()
+    json_response = json.loads(response)
+    if 'items' not in json_response or len(json_response['items']) == 0:
+        print('No results.')
+
+    for item in json_response['items']:
+        print('{} - {}'.format(item['id'], item['name']))
+        if item['variants']:
+            for variant in item['variants']:
+                print('{:>20} - {}'.format(variant['id'], variant['name']))
+
+        print()
     pass
 
 
@@ -242,7 +263,7 @@ def main():
         dest='add_listings',
         action='store_const',
         const=add_listings,
-        default=do_nothing,
+        default=None,
         help='Will list all the items defined in the _listings variable to the user\'s profile.'
     )
 
@@ -253,7 +274,7 @@ def main():
         dest='dump_listings',
         action='store_const',
         const=dump_listings,
-        default=do_nothing,
+        default=None,
         help='Will dump all listings AFTER deleting/creating listings.'
     )
 
@@ -264,7 +285,7 @@ def main():
         dest='dump_old_listings',
         action='store_const',
         const=dump_listings,
-        default=do_nothing,
+        default=None,
         help='Will dump all listings BEFORE deleting/creating listings.'
     )
 
@@ -275,7 +296,7 @@ def main():
         dest='delete_listings',
         action='store_const',
         const=delete_listings,
-        default=do_nothing,
+        default=None,
         help='Will delete all postings in the user\'s profile.'
     )
 
@@ -284,19 +305,40 @@ def main():
         '--periodically',
         '--periodically-list',
         type=int,
+        dest='period',
         metavar='MINUTES',
         help='If this is set, it will re-post all listings every N minutes.'
     )
 
+    parser.add_argument(
+        '-s',
+        '--search',
+        '--search-item',
+        nargs='*',
+        dest='search_terms',
+        metavar='SEARCH TERMS',
+        help='Will search Nookazon for items matching SEARCH TERMS and return their ids and variants.'
+    )
+
     args = parser.parse_args()
 
-    args.dump_old_listings()
-    args.delete_listings()
-    args.add_listings()
-    args.dump_listings()
+    if args.dump_old_listings:
+        args.dump_old_listings()
 
-    if args.periodically:
-        refresh_periodically(args.periodically)
+    if args.delete_listings:
+        args.delete_listings()
+
+    if args.add_listings:
+        args.add_listings()
+
+    if args.dump_listings:
+        args.dump_listings()
+
+    if args.period:
+        refresh_periodically(args.period)
+
+    if args.search_terms:
+        search_item(args.search_terms)
 
     exit(0)
 

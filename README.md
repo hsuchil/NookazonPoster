@@ -2,9 +2,10 @@
 A simple python script to manage Nookazon postings.
 
 To use:
-- Get your seller id and auth token from the Nookazon website.
-- Update the `_listings` variable at the top of the script to match what you're trying to sell.
-- See usage below.
+1. Get your seller id and auth token from the Nookazon website.
+2. Update the `_seller` and `_discord_token` variables with your own, from the previous step.
+3. Update the `_listings` variable at the top of the script to match what you're trying to sell.
+4. See usage below.
 
 ```
 usage: Nookazon.py [-h] [-a] [-du] [-do] [-d] [-p MINUTES]

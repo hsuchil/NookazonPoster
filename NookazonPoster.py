@@ -113,8 +113,9 @@ def get_connection():
 
 def get_default_headers():
     return {
+        'Accept-Language': 'en-US',
+        'Authorization': _discord_token,
         'Content-type': 'application/json',
-        'authorization': _discord_token
     }
 
 
@@ -250,7 +251,6 @@ def search_item(search_terms):
                 print('{:>20} - {}'.format(variant['id'], variant['name']))
 
         print()
-    pass
 
 
 def main():
